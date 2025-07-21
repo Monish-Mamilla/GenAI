@@ -1,7 +1,9 @@
 import streamlit as st
 import pandas as pd
-from data_extractor import extract
+from data_extractor import DataExtractor
 
+from dotenv import load_dotenv
+load_dotenv()
 # Title
 st.title("Financial Data Extractor")
 
@@ -12,7 +14,8 @@ paragraph = st.text_area("Enter financial paragraph:")
 # Button to extract data
 if st.button("Extract"):
     if paragraph:
-        extracted_data = extract(paragraph)
+        extractor = DataExtractor()
+        extracted_data = extractor.extract(paragraph)
         data = {
             'Measure': ['Revenue', 'EPS'],
             'Estimated': [extracted_data['revenue_expected'], extracted_data['eps_expected']],

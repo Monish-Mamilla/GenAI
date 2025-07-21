@@ -3,38 +3,36 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.exceptions import OutputParserException
 
-from dotenv import load_dotenv
-load_dotenv()
+class DataExtractor:
 
-llm = ChatGroq(model_name="llama-3.3-70b-versatile")
+    def __init__(self):
+        self.llm = ChatGroq(model_name="llama-3.3-70b-versatile")
 
 
-# Mock function to extract financial data (replace with actual function)
-def extract(article_text):
-    prompt = '''
-    From the below news article, extract revenue and eps in JSON format containing the
-    following keys: 'revenue_actual', 'revenue_expected', 'eps_actual', 'eps_expected'. 
+    # Mock function to extract financial data (replace with actual function)
+    def extract(self,article_text):
+        prompt = '''
+        From the below news article, extract revenue and eps in JSON format containing the
+        following keys: 'revenue_actual', 'revenue_expected', 'eps_actual', 'eps_expected'. 
 
-    Each value should have a unit such as million or billion.
+        Each value should have a unit such as million or billion.
 
-    Only return the valid JSON. No preamble.
+        Only return the valid JSON. No preamble.
 
-    Article
-    =======
-    {article}
-    '''
+        Article
+        =======
+        {article}
+        '''
 
-    pt = PromptTemplate.from_template(prompt)
+        pt = PromptTemplate.from_template(prompt)
 
-    global llm
+        chain = pt | self.llm
+        response = chain.invoke({'article': article_text})
+        parser = JsonOutputParser()
 
-    chain = pt | llm
-    response = chain.invoke({'article': article_text})
-    parser = JsonOutputParser()
+        try:
+            res = parser.parse(response.content)
+        except OutputParserException:
+            raise OutputParserException("Context too big. Unable to parse jobs.")
 
-    try:
-        res = parser.parse(response.content)
-    except OutputParserException:
-        raise OutputParserException("Context too big. Unable to parse jobs.")
-
-    return res
+        return res

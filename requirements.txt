@@ -5,4 +5,7 @@ langchain-groq
 langchain-ollama
 pyarrow==12.0.1
 streamlit==1.34.0
+posthog
+chromadb
+protobuf==4.25.3
 
